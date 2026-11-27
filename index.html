@@ -51,7 +51,7 @@ main{padding:22px 24px 90px;max-width:1400px}
 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .g2>*,.g3>*,.vh>*,.ff>*{min-width:0}
-main{overflow-x:hidden}
+main{overflow-x:clip}
 .ff{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:var(--w);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;position:relative;overflow:hidden}
@@ -144,6 +144,11 @@ th{font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;f
 .dl{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}.dl span{color:var(--m);flex:0 0 auto}.dl b{text-align:right;font-weight:600}
 .big img{max-width:100%;border-radius:12px;display:block;margin:auto}
 .prt{display:none}
+#bnav,.mt{display:none}
+.flt>summary{list-style:none;cursor:pointer;font-weight:600;display:none}
+.flt>summary::-webkit-details-marker{display:none}
+.ff.dt{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.sheet .li{padding:14px 4px}
 @media(max-width:1200px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){
   #side{display:none}#wrap{margin-left:0}
@@ -152,12 +157,27 @@ th{font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;f
   #top h1{display:none}#top .sp2{flex:1}
   #top .ib{border-color:#2a312c;color:#fff;width:40px;height:40px}
   #top .ub{border-color:#2a312c;padding:4px}#top .ub>div{display:none}
-  #mnav{display:flex;position:sticky;top:calc(60px + env(safe-area-inset-top));z-index:14;background:var(--k);gap:6px;overflow-x:auto;padding:0 10px 10px;scrollbar-width:none}
+  #mnav{display:none!important;position:sticky;top:calc(60px + env(safe-area-inset-top));z-index:14;background:var(--k);gap:6px;overflow-x:auto;padding:0 10px 10px;scrollbar-width:none}
   #mnav::-webkit-scrollbar{display:none}
   #mnav button{width:auto;flex:0 0 auto;padding:8px 12px;font-size:13px;gap:7px;color:#c3cbc5;background:#161b18}
   #mnav button.on{background:var(--g);color:var(--k)}
   #mnav button svg{width:16px;height:16px}
-  main{padding:14px 10px 100px}
+  main{padding:12px 10px calc(96px + env(safe-area-inset-bottom))}
+  .mt{display:flex;align-items:center;justify-content:space-between;font-size:22px;font-weight:800;margin:4px 4px 12px}
+  #bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--k);border-top:1px solid #1d231f;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  #bnav button{background:none;border:0;color:#8f9a93;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:4px 0;position:relative;cursor:pointer}
+  #bnav button.on{color:var(--g)}
+  #bnav button.c span.cc{width:52px;height:52px;border-radius:50%;background:var(--g);color:var(--k);display:grid;place-items:center;margin-top:-22px;box-shadow:0 6px 16px rgba(47,224,67,.35);border:4px solid var(--k)}
+  #bnav i{position:absolute;top:0;left:calc(50% + 6px);background:var(--o);color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:999px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px}
+  .fab{display:none!important}
+  .flt>summary{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+  .flt[open]>summary{margin-bottom:10px}
+  .ff{grid-template-columns:minmax(0,1fr)}
+  .ff.dt{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{padding:12px}.kpi small{font-size:11.5px}
+  .seg{flex:1}.seg button{flex:1}
+  .stick{position:sticky;bottom:calc(74px + env(safe-area-inset-bottom));z-index:5;background:linear-gradient(transparent,var(--w) 30%);padding-top:14px;margin:0 -14px -14px;padding:14px 14px 14px}
+  .stick .btn{width:100%;min-height:52px;font-size:16px}
   .g2,.g3,.vh{grid-template-columns:minmax(0,1fr)}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .kpi b{font-size:26px}
@@ -176,10 +196,10 @@ th{font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;f
   table.cards td:before{content:attr(data-l);color:var(--m);font-size:12.5px;font-weight:600;text-align:left}
   .modal{align-items:flex-end;padding:0}
   .box{border-radius:18px 18px 0 0;max-height:92vh;padding-bottom:calc(22px + env(safe-area-inset-bottom))}
-  .toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(92px + env(safe-area-inset-bottom))}
 }
 @media print{
-  #side,#top,#mnav,.fab,.noprint,.toast{display:none!important}
+  #side,#top,#mnav,#bnav,.mt,.fab,.noprint,.toast{display:none!important}
   #wrap{margin:0}main{padding:0}body{background:#fff}
   .card{border:1px solid #ccc;break-inside:avoid}
   .prt{display:block;margin-bottom:12px}
@@ -201,6 +221,7 @@ th{font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.05em;f
   <nav id="mnav"></nav>
   <main id="main"></main>
 </div>
+<nav id="bnav"></nav>
 <button class="fab" id="fab" aria-label="Nova reserva"></button>
 <div class="modal" id="modal"><div class="box" id="mbox"></div></div>
 <div class="toast" id="toast"></div>
@@ -345,7 +366,7 @@ function notifs(){const m=me(),seen=DB.seen[m.id]||0,n=[];
 
 // ============ navegação ============
 const MENU=[['dash','Dashboard','grid','dashboard'],['agenda','Agenda','cal','agenda'],['nova','Nova reserva','plus','criar'],['aprov','Aprovações','check','aprovar'],['check','Checklists','clip','checklist'],['frota','Frota','truck','ver_frota'],['users','Usuários','users','usuarios'],['rel','Relatórios','chart','relatorios'],['cfg','Configurações','cog','config']];
-function go(v,keep){S.view=v;if(!keep)S.veh='';render();window.scrollTo(0,0)}
+function go(v,keep){closeModal();S.view=v;if(!keep)S.veh='';render();window.scrollTo(0,0)}
 function render(){
   const items=MENU.filter(m=>can(m[3]));
   if(!items.find(m=>m[0]===S.view))S.view=(items[0]||MENU[0])[0];
@@ -358,7 +379,15 @@ function render(){
   $('#ubtn').innerHTML=ub;$('#sme').innerHTML=`<button class="ub" style="width:100%;border-color:#232a25;color:#fff" onclick="trocarUser()">${ub.replace('<small>','<small style="color:#8a948d">')}</button>`;
   const nn=notifs().length;$('#bell').innerHTML=ic('bell')+(nn?`<i>${nn>99?'99+':nn}</i>`:'');
   $('#ptitle').textContent=(MENU.find(x=>x[0]===S.view)||[0,''])[1];
-  const fn=V[S.view];$('#main').innerHTML=fn[0]();fn[1]&&fn[1]();
+  const tit=(MENU.find(x=>x[0]===S.view)||[0,''])[1];
+  const fn=V[S.view];$('#main').innerHTML=`<div class="mt">${tit}</div>`+fn[0]();fn[1]&&fn[1]();
+  const quatro=can('aprovar')?'aprov':can('checklist')?'check':can('ver_frota')?'frota':'';
+  const bi=[['dash','Início','grid'],['agenda','Agenda','cal'],can('criar')?['nova','Reservar','add']:null,quatro?MENU.find(x=>x[0]===quatro).slice(0,3):null,['mais','Mais','grid']].filter(Boolean).filter(x=>x[0]==='mais'||items.find(m=>m[0]===x[0]));
+  const naBarra=bi.map(x=>x[0]);
+  $('#bnav').style.gridTemplateColumns=`repeat(${bi.length},1fr)`;
+  $('#bnav').innerHTML=bi.map(([k,n,i])=>{const on=k==='mais'?!naBarra.includes(S.view):S.view===k;const b=k==='aprov'&&pend?`<i>${pend}</i>`:k==='check'&&ck?`<i>${ck}</i>`:'';
+    return k==='nova'?`<button class="c ${on?'on':''}" data-v="nova"><span class="cc">${ic('add',26)}</span>${n}</button>`:`<button class="${on?'on':''}" ${k==='mais'?'id="bMais"':`data-v="${k}"`}>${k==='mais'?'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>':ic(i,22)}${n}${b}</button>`}).join('');
+  $('#bMais').onclick=()=>maisMenu(items,naBarra);
   $('#fab').classList.toggle('show',['dash','agenda'].includes(S.view)&&can('criar'));
   const on=$('#mnav button.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
   save();
@@ -379,6 +408,18 @@ function trocarUser(){
   $$('#mbox [data-u]').forEach(x=>x.onclick=()=>{S.user=x.dataset.u;closeModal();go('dash');const n=notifs().length;toast(`Olá, ${me().nome.split(' ')[0]}!${n?` Você tem ${n} notificação(ões).`:''}`)});
 }
 
+let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e});
+function maisMenu(items,naBarra){
+  const pend=DB.res.filter(r=>r.status==='pendente').length,ck=pendCheck().length,m=me();
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),stand=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  openModal(`<h2>Menu <button class="x" onclick="closeModal()">×</button></h2><div class="sheet">
+  <div class="li" id="mUser"><span class="av">${ini(m.nome)}</span><div class="tx"><b>${esc(m.nome)}</b><small>${PERFIS[m.perfil]} · toque para trocar de usuário</small></div></div>
+  ${items.filter(x=>!naBarra.includes(x[0])).map(([k,n,i])=>`<div class="li" data-v="${k}"><span class="th" style="width:40px;height:40px;background:#f2f4f3;color:var(--t)">${ic(i,20)}</span><div class="tx"><b>${n}</b></div>${k==='aprov'&&pend?`<span class="chip o">${pend}</span>`:k==='check'&&ck?`<span class="chip o">${ck}</span>`:''}</div>`).join('')}
+  ${stand?'':`<div class="li" id="mInst"><span class="th" style="width:40px;height:40px;background:var(--g);color:var(--k)">${ic('dl',20)}</span><div class="tx"><b>Instalar na tela inicial</b><small>Abre como aplicativo, em tela cheia</small></div></div>`}
+  </div>`);
+  $('#mUser').onclick=trocarUser;
+  if($('#mInst'))$('#mInst').onclick=async()=>{if(instEv){instEv.prompt();await instEv.userChoice;instEv=null;closeModal()}else openModal(`<h2>Instalar o app <button class="x" onclick="closeModal()">×</button></h2>${ios?'<p>No Safari, toque em <b>Compartilhar</b> (quadrado com seta) e depois em <b>Adicionar à Tela de Início</b>.</p>':'<p>No Chrome, toque nos <b>⋮</b> (três pontos) e depois em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</p>'}`)};
+}
 // ============ modal ============
 function openModal(h){$('#mbox').innerHTML=h;$('#modal').classList.add('show')}
 function closeModal(){$('#modal').classList.remove('show')}
@@ -448,15 +489,16 @@ function vAgenda(){
   }
   const mots=DB.users.filter(u=>u.perfil==='motorista');
   return `<div class="card">
-    <div class="row" style="margin-bottom:12px"><div class="seg">${['dia','semana','mes'].map(x=>`<button data-mode="${x}" class="${mode===x?'on':''}">${{dia:'Dia',semana:'Semana',mes:'Mês'}[x]}</button>`).join('')}</div><span class="sp"></span>
-      <button class="btn sm" data-nav="-1">‹</button><button class="btn sm" data-nav="0">Hoje</button><button class="btn sm" data-nav="1">›</button></div>
+    <div class="row" style="margin-bottom:12px"><div class="seg">${['dia','semana','mes'].map(x=>`<button data-mode="${x}" class="${mode===x?'on':''}">${{dia:'Dia',semana:'Semana',mes:'Mês'}[x]}</button>`).join('')}</div><span class="sp"></span><span class="row" style="flex-wrap:nowrap;gap:6px">
+      <button class="btn sm" data-nav="-1">‹</button><button class="btn sm" data-nav="0">Hoje</button><button class="btn sm" data-nav="1">›</button></span></div>
     <div class="row" style="margin-bottom:12px"><b style="font-size:17px">${titulo}</b><span class="sp"></span>${oc?`<span class="chip">${oc} encerradas ocultas</span>`:''}</div>
+    <details class="flt" ${matchMedia('(max-width:900px)').matches?'':'open'}><summary>${ic('cog',18)} Filtros${[S.fMot,S.fVei,S.fSit,S.passadas].filter(Boolean).length?` <span class="chip g">${[S.fMot,S.fVei,S.fSit,S.passadas].filter(Boolean).length} ativo(s)</span>`:''}<span class="sp"></span>›</summary>
     <div class="ff" style="margin-bottom:14px">
       <div><label class="l">Motorista</label><select id="fMot"><option value="">Todos</option>${mots.map(x=>`<option value="${x.id}" ${S.fMot===x.id?'selected':''}>${esc(x.nome)}</option>`).join('')}</select></div>
       <div><label class="l">Veículo</label><select id="fVei"><option value="">Todos</option>${DB.fleet.map(f=>`<option value="${f.id}" ${S.fVei===f.id?'selected':''}>${esc(f.placa)} — ${esc(vNome(f))}</option>`).join('')}</select></div>
       <div><label class="l">Situação</label><select id="fSit"><option value="">Ativas e concluídas</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${S.fSit===k?'selected':''}>${v[0]}</option>`).join('')}</select></div>
       <div><label class="l">&nbsp;</label><label class="row" style="min-height:42px;cursor:pointer"><input type="checkbox" id="fPas" ${S.passadas?'checked':''}> Mostrar encerradas</label></div>
-    </div>
+    </div></details>
     ${corpo}
     <div class="leg">${Object.keys(ST).map(s=>chip(s)).join('')}</div>
     <p class="sub" style="margin:12px 0 0">${can('arrastar')?'Arraste uma reserva para outro dia (computador) ou toque nela para reagendar.':'Toque em uma reserva para ver os detalhes.'}</p>
@@ -517,6 +559,7 @@ function vNova(){
    <div><label class="l">Veículo de tração</label><select name="tracao" required>${tr.map(f=>`<option value="${f.id}" ${bloq(f)?'disabled':''}>${esc(f.placa)} — ${esc(vNome(f))}${bloq(f)?' ('+f.status+')':''}</option>`).join('')}</select></div>
    <div><label class="l">Motorista</label><select name="motorista" required>${mots.map(m=>`<option value="${m.id}">${esc(m.nome)}${m.cnh?' (CNH '+esc(m.cnh)+')':''}</option>`).join('')}</select></div>
    <div><label class="l">Destino / finalidade</label><input name="destino" required placeholder="Ex.: Evento Sea-Doo — Ilhabela"></div>
+  </div><div class="ff dt" style="margin-top:12px">
    <div><label class="l">Data de retirada</label><input type="date" name="saida" required min="${TODAY()}" value="${TODAY()}"></div>
    <div><label class="l">Hora de retirada</label><input type="time" name="horaSaida" required value="08:00"></div>
    <div><label class="l">Data de devolução</label><input type="date" name="retorno" required min="${TODAY()}" value="${TODAY()}"></div>
@@ -526,7 +569,7 @@ function vNova(){
   <div class="ff">${ap.map(f=>`<label class="ci" style="margin:0"><input type="checkbox" name="apoios" value="${f.id}" ${bloq(f)?'disabled':''}><span><b>${esc(f.placa)}</b><br><small style="color:var(--m)">${esc(vNome(f))}${bloq(f)?' — '+f.status:''}</small></span></label>`).join('')||'<div class="info">Nenhum apoio cadastrado.</div>'}</div>
   <label class="l" style="margin-top:14px">Observações</label><textarea name="obs" placeholder="Carga, contatos, horários..."></textarea>
   <div id="nErr" class="err"></div>
-  <div class="row" style="margin-top:14px"><button class="btn g" type="submit">${ic('check',18)} Enviar para aprovação</button></div></form>`;
+  <div class="row stick" style="margin-top:14px"><button class="btn g" type="submit">${ic('check',18)} Enviar para aprovação</button></div></form>`;
 }
 function bNova(){
   const f=$('#fNova');f.querySelectorAll('.ci input').forEach(c=>c.onchange=()=>c.closest('.ci').classList.toggle('ok',c.checked));
@@ -586,10 +629,10 @@ function vCheck(){
    <div class="row"><button type="button" class="btn sm" id="ckBack">${ic('back',16)} Voltar</button><span class="sp"></span>${chip(r.status)}</div>
    <h2 style="margin-top:14px">Checklist de ${fase.toLowerCase()} — ${esc(r.chamado)}</h2>
    <div class="kv"><div><small>Veículos</small><b>${placas(r)}</b></div><div><small>Motorista</small><b>${esc(U(r.motorista).nome)}</b></div><div><small>${fase==='Retirada'?'Retirada prevista':'Devolução prevista'}</small><b>${fase==='Retirada'?br(r.saida)+' '+r.horaSaida:br(r.retorno)+' '+r.horaRetorno}</b></div><div><small>Vistoriador</small><b>${esc(me().nome)}</b></div></div>
-   <div class="row" style="margin-top:12px"><button type="button" class="btn sm" id="ckAll">Marcar todos como OK</button></div>
+   <div class="row" style="margin-top:12px"><button type="button" class="btn sm" id="ckAll">Marcar todos como OK</button><span class="sp"></span><span class="chip" id="ckCnt"></span></div>
    ${Object.entries(CK).map(([sec,its])=>`<h3>${sec}</h3>${its.map(it=>`<label class="ci"><input type="checkbox" name="it" value="${esc(it)}"><span>${esc(it)}</span></label>`).join('')}`).join('')}
    <h3>Medições</h3>
-   <div class="ff"><div><label class="l">Quilometragem de ${fase==='Retirada'?'saída':'retorno'} (km)</label><input type="number" name="km" required min="${kmMin||0}" value="${fase==='Retirada'&&v.km!==''?v.km:''}" placeholder="${kmMin?'mín. '+kmMin:'Ex.: 152340'}"></div>
+   <div class="ff dt"><div><label class="l">Quilometragem de ${fase==='Retirada'?'saída':'retorno'} (km)</label><input type="number" name="km" required min="${kmMin||0}" value="${fase==='Retirada'&&v.km!==''?v.km:''}" placeholder="${kmMin?'mín. '+kmMin:'Ex.: 152340'}"></div>
     <div><label class="l">Combustível</label><select name="comb">${COMB.map(c=>`<option>${c}</option>`).join('')}</select></div>
     <div><label class="l">${fase==='Retirada'?'Retirado por':'Devolvido por'}</label><select name="resp">${pessoas.map(u=>`<option value="${u.id}" ${u.id===r.motorista?'selected':''}>${esc(u.nome)}</option>`).join('')}</select></div></div>
    ${fase==='Devolução'?`<h3>Custos da viagem (opcional)</h3><div class="ff"><div><label class="l">Combustível (R$)</label><input type="number" step="0.01" min="0" name="cComb"></div><div><label class="l">Pedágios (R$)</label><input type="number" step="0.01" min="0" name="cPed"></div><div><label class="l">Outros (R$)</label><input type="number" step="0.01" min="0" name="cOut"></div></div>`:''}
@@ -598,7 +641,7 @@ function vCheck(){
    <div class="pics" id="ckP"></div>
    <h3>Avarias e observações</h3><textarea name="obs" placeholder="Descreva avarias, riscos, itens faltando... (obrigatório se algum item não estiver OK)"></textarea>
    <div id="ckErr" class="err"></div>
-   <div class="row" style="margin-top:14px"><button class="btn g" type="submit">${ic('check',18)} Registrar ${fase.toLowerCase()}${fase==='Retirada'?' e liberar veículo':' e concluir'}</button></div>
+   <div class="row stick" style="margin-top:14px"><button class="btn g" type="submit">${ic('check',18)} Registrar ${fase.toLowerCase()}${fase==='Retirada'?' e liberar veículo':' e concluir'}</button></div>
   </form>`;
 }
 function bCheck(){
@@ -607,8 +650,9 @@ function bCheck(){
   const r=DB.res.find(x=>x.id===S.ckRes),fase=r.status==='aprovada'?'Retirada':'Devolução';
   const pics=()=>{$('#ckP').innerHTML=ckFotos.map((p,i)=>`<div style="background-image:url(${p})" data-pic="${p}"><button type="button" data-rm="${i}">×</button></div>`).join('');$$('[data-rm]').forEach(b=>b.onclick=e=>{e.stopPropagation();ckFotos.splice(+b.dataset.rm,1);pics()})};pics();
   $('#ckBack').onclick=()=>{S.ckRes='';ckFotos=[];render()};
-  f.querySelectorAll('.ci input').forEach(c=>c.onchange=()=>c.closest('.ci').classList.toggle('ok',c.checked));
-  $('#ckAll').onclick=()=>f.querySelectorAll('.ci input').forEach(c=>{c.checked=true;c.closest('.ci').classList.add('ok')});
+  const cnt=()=>{const a=f.querySelectorAll('.ci input'),o=[...a].filter(x=>x.checked).length;$('#ckCnt').textContent=`${o}/${a.length} OK`;$('#ckCnt').className='chip '+(o===a.length?'g':'')};cnt();
+  f.querySelectorAll('.ci input').forEach(c=>c.onchange=()=>{c.closest('.ci').classList.toggle('ok',c.checked);cnt()});
+  $('#ckAll').onclick=()=>{f.querySelectorAll('.ci input').forEach(c=>{c.checked=true;c.closest('.ci').classList.add('ok')});cnt()};
   $('#ckF').onchange=async e=>{for(const fl of e.target.files){try{ckFotos.push(await compress(fl,800,.55))}catch(x){toast('Não foi possível ler uma das fotos.','r')}}e.target.value='';pics()};
   f.onsubmit=e=>{e.preventDefault();const d=new FormData(f),err=t=>$('#ckErr').textContent=t;
     const itens={};f.querySelectorAll('.ci input').forEach(c=>itens[c.value]=c.checked);
