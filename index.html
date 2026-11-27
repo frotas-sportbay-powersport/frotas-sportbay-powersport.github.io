@@ -2,7 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Frota Sportbay">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <title>Gestão de Logística de Frota — Sportbay Powersports</title>
 <style>
 :root{--navy:#0b0d0c;--navy2:#1a201c;--green:#2ecc5f;--bg:#f3f5f3;--card:#fff;--line:#e1e6e2;--txt:#0f1411;--mut:#5b665f;--blue:#22a84d;--ok:#22a84d;--warn:#d98a0b;--bad:#d2423b;--soft:#ecf8f0}
@@ -61,7 +69,48 @@ th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em
 .modal .box{background:#fff;border-radius:18px 18px 0 0;padding:20px;width:100%;max-width:560px;max-height:85vh;overflow:auto}
 @media(min-width:700px){.modal{align-items:center}.modal .box{border-radius:18px}}
 @media(max-width:820px){.week{grid-template-columns:1fr}.day{min-height:auto}}
-footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:20px 20px calc(90px + env(safe-area-inset-bottom))}
+html{-webkit-text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+header{padding-top:calc(22px + env(safe-area-inset-top))}
+nav{position:sticky;top:0;z-index:30;background:var(--bg)}
+.fab{position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;background:var(--green);color:#0b0d0c;border:none;font-size:30px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:35;display:none;line-height:1}
+.fab.show{display:block}
+.toast{bottom:calc(90px + env(safe-area-inset-bottom))}
+.modal .box{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+@media(max-width:700px){
+  body{font-size:16px}
+  header{padding:calc(14px + env(safe-area-inset-top)) 16px 16px;border-radius:0 0 16px 16px}
+  header h1,header p,header .hint{display:none}
+  header .pill{margin-bottom:10px}
+  header label{font-size:13px}
+  #reset{min-height:36px;font-size:13px;padding:6px 12px;background:transparent;color:#a9b5ad;border-color:#2c332e;flex:0 0 auto}
+  .brand{margin-bottom:8px}.logo{width:36px;height:36px;font-size:15px}.bname{font-size:16px}
+  header .row{margin-top:8px!important}
+  nav{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding:10px 12px;gap:8px;scrollbar-width:none;border-bottom:1px solid var(--line);box-shadow:0 4px 10px rgba(0,0,0,.04)}
+  nav::-webkit-scrollbar{display:none}
+  nav button{flex:0 0 auto;scroll-snap-align:start;white-space:nowrap;padding:10px 14px}
+  main{padding:4px 10px 20px}
+  .card{padding:14px;border-radius:14px;margin:10px 0}
+  .card h2{font-size:19px}
+  select,input,textarea{font-size:16px;min-height:46px}
+  button{min-height:44px}
+  .row button{flex:1 1 auto}
+  .day{padding:10px}
+  .day.vazio{display:none}
+  .day h4{font-size:14px}
+  .bar{font-size:14px;padding:10px 12px}
+  .grid2{grid-template-columns:1fr;gap:10px}
+  table.cards,table.cards tbody,table.cards tr,table.cards td{display:block;width:100%}
+  table.cards tr:first-child{display:none}
+  table.cards tr{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;background:#fff}
+  table.cards td{border:none;padding:5px 0;display:flex;justify-content:space-between;gap:12px;text-align:right}
+  table.cards td::before{content:attr(data-l);color:var(--mut);font-size:13px;text-align:left}
+  table.cards td:last-child button{width:100%}
+  table.cards td:last-child::before{content:none}
+  .perm{font-size:13px}.perm th{font-size:10px}
+  .chk{padding:12px 0}
+}
 .perm td,.perm th{text-align:center}.perm td:first-child,.perm th:first-child{text-align:left}
 .err{color:var(--bad);font-size:13px;margin-top:6px}
 </style>
@@ -82,6 +131,7 @@ footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
 <footer>Sportbay Powersports • Operações BRP • Logística de frota<br>Sistema atualizado em <span id="hoje"></span></footer>
 <div class="modal" id="modal"><div class="box" id="mbox"></div></div>
 <div class="toast" id="toast"></div>
+<button class="fab" id="fab" aria-label="Nova reserva">+</button>
 
 <script>
 // ---------- utilidades ----------
@@ -186,7 +236,7 @@ function viewAgenda(){
   const mots=DB.users.filter(u=>u.perfil==='motorista');
   return `<div class="card"><h2>Agenda semanal de ativos</h2>
   <p class="sub">Cada barra é uma reserva no dia da saída. ${can('arrastar')?'Arraste entre dias ou toque na barra para reagendar.':'Arrastar disponível apenas para o perfil Gerente.'}</p>
-  <div class="row"><button id="wPrev">Semana anterior</button><button class="ghost" id="wHoje">Hoje</button><button id="wNext">Próxima semana</button></div>
+  <div class="row"><button id="wPrev">‹ Anterior</button><button class="ghost" id="wHoje">Hoje</button><button id="wNext">Próxima ›</button></div>
   <div class="row" style="justify-content:space-between;margin-top:14px"><strong style="font-size:17px">${br(dias[0])} – ${br(dias[6])}</strong><span class="badge">${ocult} ocultados</span></div>
   <div class="info">Exibindo apenas agendamentos de hoje em diante.</div>
   <div class="grid2" style="margin-top:12px">
@@ -194,8 +244,9 @@ function viewAgenda(){
     <div><label>Chamado</label><input id="fCham" placeholder="Ex.: CH-1042" value="${esc(S.fCham)}"></div>
   </div>
   <div class="week">${dias.map(d=>{const dd=parse(d);const its=lista.filter(r=>r.saida===d);
-    return `<div class="day ${d===TODAY?'today':''}" data-day="${d}"><h4><span>${DIAS[dd.getDay()]} ${pad(dd.getDate())}/${pad(dd.getMonth()+1)}</span><span>${its.length||''}</span></h4>
+    return `<div class="day ${d===TODAY?'today':''} ${its.length?'':'vazio'}" data-day="${d}"><h4><span>${DIAS[dd.getDay()]} ${pad(dd.getDate())}/${pad(dd.getMonth()+1)}</span><span>${its.length||''}</span></h4>
     ${its.map(r=>`<div class="bar s-${r.status}" data-id="${r.id}" ${can('arrastar')?'draggable="true"':''}><b>${esc(F(r.tracao).placa)}</b>${r.apoios.length?' + '+r.apoios.map(a=>esc(F(a).placa)).join(', '):''}<small>${esc(r.chamado)} • ${esc(U(r.motorista).nome)}</small><small>${esc(r.destino)}</small></div>`).join('')||'<div class="muted">—</div>'}</div>`}).join('')}</div>
+  ${lista.some(r=>dias.includes(r.saida))?'':'<div class="info">Nenhuma reserva nesta semana.</div>'}
   <div class="legend">${Object.entries(STATUS).map(([k,v])=>`<span><i class="s-${k}"></i>${v}</span>`).join('')}</div></div>`;
 }
 function bindAgenda(){
@@ -285,8 +336,8 @@ function viewFila(){
   <div class="muted" style="margin:6px 0">${esc(F(r.tracao).placa)}${r.apoios.length?' + '+r.apoios.map(a=>esc(F(a).placa)).join(', '):''} • Motorista: ${esc(U(r.motorista).nome)} • Solicitante: ${esc(U(r.solicitante).nome)}</div>
   ${r.obs?`<div class="muted">Obs.: ${esc(r.obs)}</div>`:''}
   ${pode?`<div class="row" style="margin-top:10px"><button class="ok" data-ap="${r.id}">Aprovar</button><button class="bad" data-rj="${r.id}">Rejeitar</button><button data-dt="${r.id}">Detalhes</button></div>`:''}</div>`).join('')||'<div class="info">Nenhuma solicitação pendente. 🎉</div>'}
-  </div><div class="card"><h2 style="font-size:18px">Decisões recentes</h2><div class="tw"><table><tr><th>Chamado</th><th>Saída</th><th>Status</th><th>Destino</th></tr>
-  ${rec.map(r=>`<tr><td>${esc(r.chamado)}</td><td>${br(r.saida)}</td><td><span class="badge">${STATUS[r.status]}</span></td><td>${esc(r.destino)}</td></tr>`).join('')}</table></div></div>`;
+  </div><div class="card"><h2 style="font-size:18px">Decisões recentes</h2><div class="tw"><table class="cards"><tr><th>Chamado</th><th>Saída</th><th>Status</th><th>Destino</th></tr>
+  ${rec.map(r=>`<tr><td data-l="Chamado"><b>${esc(r.chamado)}</b></td><td data-l="Saída">${br(r.saida)}</td><td data-l="Status"><span class="badge">${STATUS[r.status]}</span></td><td data-l="Destino">${esc(r.destino)}</td></tr>`).join('')}</table></div></div>`;
 }
 function bindFila(){
   document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>{const r=DB.res.find(x=>x.id===b.dataset.ap);r.status='aprovada';log(r,'Aprovada');save();render();toast(r.chamado+' aprovada')});
@@ -333,8 +384,8 @@ function viewUsuarios(){
   const pode=can('usuarios');
   return `<div class="card"><h2>Usuários</h2><p class="sub">${pode?'Cadastre e edite quem usa o sistema.':'Somente leitura para o seu perfil.'}</p>
   ${pode?'<button class="pri" id="uNovo">+ Novo usuário</button>':''}
-  <div class="tw" style="margin-top:12px"><table><tr><th>Nome</th><th>Perfil</th><th>E-mail</th><th>CNH</th><th>Status</th>${pode?'<th></th>':''}</tr>
-  ${DB.users.map(u=>`<tr><td>${esc(u.nome)}</td><td>${PERFIS[u.perfil]}</td><td>${esc(u.email)}</td><td>${esc(u.cnh||'—')}</td><td>${u.ativo?'Ativo':'Inativo'}</td>${pode?`<td><button data-ue="${u.id}">Editar</button></td>`:''}</tr>`).join('')}</table></div></div>`;
+  <div class="tw" style="margin-top:12px"><table class="cards"><tr><th>Nome</th><th>Perfil</th><th>E-mail</th><th>CNH</th><th>Status</th>${pode?'<th></th>':''}</tr>
+  ${DB.users.map(u=>`<tr><td data-l="Nome"><b>${esc(u.nome)}</b></td><td data-l="Perfil">${PERFIS[u.perfil]}</td><td data-l="E-mail">${esc(u.email)}</td><td data-l="CNH">${esc(u.cnh||'—')}</td><td data-l="Status">${u.ativo?'Ativo':'Inativo'}</td>${pode?`<td><button data-ue="${u.id}">Editar</button></td>`:''}</tr>`).join('')}</table></div></div>`;
 }
 function formUser(u){
   u=u||{nome:'',perfil:'solicitante',email:'',cnh:'',ativo:true};
@@ -361,8 +412,8 @@ function viewFrota(){
   const tot=t=>DB.fleet.filter(f=>f.tipo===t).length;
   return `<div class="card"><h2>Frota</h2><p class="sub">Veículos de tração e apoios (carretas, reboques). ${tot('Tração')} tração • ${tot('Apoio')} apoios • ${DB.fleet.filter(f=>f.status==='Manutenção').length} em manutenção.</p>
   ${pode?'<button class="pri" id="fNovo">+ Novo veículo</button>':''}
-  <div class="tw" style="margin-top:12px"><table><tr><th>Placa</th><th>Modelo</th><th>Tipo</th><th>Status</th><th>Próxima saída</th>${pode?'<th></th>':''}</tr>
-  ${DB.fleet.map(f=>{const u=emUso(f.id),p=prox(f.id);return `<tr><td><b>${esc(f.placa)}</b></td><td>${esc(f.modelo)}</td><td>${f.tipo}</td><td>${u?'Em uso ('+esc(u.chamado)+')':esc(f.status)}</td><td>${p?br(p.saida)+' • '+esc(p.chamado):'—'}</td>${pode?`<td><button data-fe="${f.id}">Editar</button></td>`:''}</tr>`}).join('')}</table></div></div>`;
+  <div class="tw" style="margin-top:12px"><table class="cards"><tr><th>Placa</th><th>Modelo</th><th>Tipo</th><th>Status</th><th>Próxima saída</th>${pode?'<th></th>':''}</tr>
+  ${DB.fleet.map(f=>{const u=emUso(f.id),p=prox(f.id);return `<tr><td data-l="Placa"><b>${esc(f.placa)}</b></td><td data-l="Modelo">${esc(f.modelo)}</td><td data-l="Tipo">${f.tipo}</td><td data-l="Status">${u?'Em uso ('+esc(u.chamado)+')':esc(f.status)}</td><td data-l="Próxima saída">${p?br(p.saida)+' • '+esc(p.chamado):'—'}</td>${pode?`<td><button data-fe="${f.id}">Editar</button></td>`:''}</tr>`}).join('')}</table></div></div>`;
 }
 function formFrota(f){
   f=f||{placa:'',modelo:'',tipo:'Tração',status:'Disponível'};
@@ -397,7 +448,11 @@ function semPerm(msg){return `<div class="card"><h2>Acesso restrito</h2><div cla
 
 // ---------- render ----------
 const VIEWS={agenda:[viewAgenda,bindAgenda],nova:[viewNova,bindNova],fila:[viewFila,bindFila],check:[viewCheck,bindCheck],usuarios:[viewUsuarios,bindUsuarios],frota:[viewFrota,bindFrota],perm:[viewPerm,bindPerm]};
-function render(){renderTop();const [v,b]=VIEWS[S.tab]||VIEWS.agenda;$('#main').innerHTML=v();b&&b()}
+function render(){renderTop();const [v,b]=VIEWS[S.tab]||VIEWS.agenda;$('#main').innerHTML=v();b&&b();
+  $('#fab').classList.toggle('show',S.tab==='agenda'&&can('criar_reserva'));
+  const on=document.querySelector('nav button.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});}
+$('#fab').onclick=()=>{S.tab='nova';save();render();window.scrollTo(0,0)};
+$('#nav').addEventListener('click',()=>{const n=$('#nav');if(window.scrollY>n.offsetTop)window.scrollTo(0,n.offsetTop)});
 render();
 </script>
 </body>
