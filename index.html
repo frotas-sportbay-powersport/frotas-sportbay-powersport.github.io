@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestão de Logística de Frota — Sportbay Powersports</title>
+<style>
+:root{--navy:#0b0d0c;--navy2:#1a201c;--green:#2ecc5f;--bg:#f3f5f3;--card:#fff;--line:#e1e6e2;--txt:#0f1411;--mut:#5b665f;--blue:#22a84d;--ok:#22a84d;--warn:#d98a0b;--bad:#d2423b;--soft:#ecf8f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:15px}
+header{background:linear-gradient(160deg,var(--navy),var(--navy2));color:#fff;padding:22px 20px 24px;border-radius:0 0 20px 20px;border-bottom:4px solid var(--green)}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:10px}.logo{width:42px;height:42px;border-radius:10px;background:var(--green);color:#0b0d0c;font-weight:900;display:grid;place-items:center;font-size:17px}.bname{font-weight:800;font-size:18px;letter-spacing:.02em}.bname span{color:var(--green)}
+.pill{display:inline-block;background:rgba(46,204,95,.18);color:#8ff0ad;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:600}
+h1{margin:10px 0 6px;font-size:26px;line-height:1.2}
+header p{margin:0 0 16px;color:#c6d0c9}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label{font-size:13px;color:var(--mut);display:block;margin-bottom:4px}
+header label{color:#dfe8e2;font-size:15px}
+select,input,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff;color:var(--txt)}
+textarea{min-height:70px}
+button{font:inherit;border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:10px;cursor:pointer;color:var(--txt)}
+button.pri{background:var(--green);color:#0b0d0c;font-weight:700;border-color:var(--green)}
+button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+button.bad{background:#fff;color:var(--bad);border-color:#f0c4c1}
+button.ghost{background:#e9ecf1;border-color:#e9ecf1}
+button:disabled{opacity:.45;cursor:not-allowed}
+.hint{font-size:13px;color:#a9b5ad;margin-top:8px}
+nav{display:flex;flex-wrap:wrap;gap:8px;padding:16px 12px 4px}
+nav button{border-radius:12px;font-weight:600;padding:10px 14px}
+nav button.on{background:var(--navy);color:var(--green);border-color:var(--navy)}
+main{padding:8px 12px 40px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:12px 0}
+.card h2{margin:0 0 6px;font-size:21px}
+.sub{color:var(--mut);margin:0 0 12px;font-size:14px}
+.info{background:var(--soft);border:1px solid #bfe6cb;color:#1a5c33;border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+.badge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:12px}
+.day{background:#f8f9fc;border:1px solid var(--line);border-radius:12px;min-height:120px;padding:8px}
+.day.today{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
+.day.over{background:#dcf5e4}
+.day h4{margin:0 0 6px;font-size:13px;color:var(--mut);display:flex;justify-content:space-between}
+.bar{border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:12.5px;color:#fff;cursor:pointer;line-height:1.3}
+.bar small{opacity:.85;display:block}
+.s-pendente{background:var(--warn)}.s-aprovada{background:var(--ok)}.s-rejeitada{background:#9aa3b2;text-decoration:line-through}.s-concluida{background:#6c7a70}.s-em_uso{background:#111}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em}
+.tw{overflow-x:auto}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.item .t{font-weight:700}
+.muted{color:var(--mut);font-size:13px}
+.chk{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.chk input{width:22px;height:22px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:var(--green);padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:90%}
+.toast.show{opacity:1}
+.modal{position:fixed;inset:0;background:rgba(10,18,35,.5);display:none;align-items:flex-end;justify-content:center;z-index:40}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:18px 18px 0 0;padding:20px;width:100%;max-width:560px;max-height:85vh;overflow:auto}
+@media(min-width:700px){.modal{align-items:center}.modal .box{border-radius:18px}}
+@media(max-width:820px){.week{grid-template-columns:1fr}.day{min-height:auto}}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+.perm td,.perm th{text-align:center}.perm td:first-child,.perm th:first-child{text-align:left}
+.err{color:var(--bad);font-size:13px;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">SB</div><div class="bname">SPORTBAY <span>POWERSPORTS</span></div></div>
+  <span class="pill">Logística de frota • BRP</span>
+  <h1>Gestão de Logística de Frota — Sportbay Powersports</h1>
+  <p>Agenda de tração e apoios, aprovações, checklists e cadastros em um só painel.</p>
+  <label for="perfil">Entrar como:</label>
+  <select id="perfil"></select>
+  <div class="row" style="margin-top:10px"><button class="ghost" id="reset">Restaurar dados de exemplo</button></div>
+  <div class="hint">Perfil ativo altera o que pode ser feito em cada tela. Escolha salva automaticamente.</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>Sportbay Powersports • Operações BRP • Logística de frota<br>Sistema atualizado em <span id="hoje"></span></footer>
+<div class="modal" id="modal"><div class="box" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- utilidades ----------
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const br=s=>{if(!s)return'—';const d=parse(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`};
+const TODAY=iso(new Date());
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+const DIAS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const STATUS={pendente:'Pendente',aprovada:'Aprovada',em_uso:'Em uso',concluida:'Concluída',rejeitada:'Rejeitada'};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+// ---------- dados ----------
+const PERFIS={gerente:'Gerente (admin)',aprovador:'Aprovador',motorista:'Motorista',solicitante:'Solicitante'};
+const ACOES={
+  ver_agenda:'Ver agenda',arrastar:'Arrastar/reagendar',criar_reserva:'Criar reserva',aprovar:'Aprovar / rejeitar',
+  checklist:'Preencher checklist',usuarios:'Gerenciar usuários',frota:'Gerenciar frota',permissoes:'Editar permissões'};
+const PERM_PADRAO={
+  gerente:{ver_agenda:1,arrastar:1,criar_reserva:1,aprovar:1,checklist:1,usuarios:1,frota:1,permissoes:1},
+  aprovador:{ver_agenda:1,arrastar:0,criar_reserva:1,aprovar:1,checklist:0,usuarios:0,frota:0,permissoes:0},
+  motorista:{ver_agenda:1,arrastar:0,criar_reserva:0,aprovar:0,checklist:1,usuarios:0,frota:0,permissoes:0},
+  solicitante:{ver_agenda:1,arrastar:0,criar_reserva:1,aprovar:0,checklist:0,usuarios:0,frota:0,permissoes:0}};
+const CHECK_ITENS=['Pneus e estepe calibrados','Nível de óleo e água','Luzes e setas funcionando','Freios e freio de mão','Engate / pino rei travado','Amarração da carga (cintas/catracas)','Documentos do veículo (CRLV)','Extintor e triângulo','Limpeza interna/externa','Avarias registradas com foto'];
+
+function seed(){
+  const t=new Date();
+  const d=n=>iso(addDays(t,n));
+  const users=[
+    {id:'u1',nome:'Carla Mendes',perfil:'gerente',email:'carla@sportbay.com.br',ativo:true},
+    {id:'u2',nome:'Rafael Souza',perfil:'aprovador',email:'rafael@sportbay.com.br',ativo:true},
+    {id:'u3',nome:'João Pereira',perfil:'motorista',email:'joao@sportbay.com.br',cnh:'E',ativo:true},
+    {id:'u4',nome:'Marcos Lima',perfil:'motorista',email:'marcos@sportbay.com.br',cnh:'E',ativo:true},
+    {id:'u5',nome:'Ana Ribeiro',perfil:'solicitante',email:'ana@sportbay.com.br',ativo:true},
+    {id:'u6',nome:'Diego Alves',perfil:'motorista',email:'diego@sportbay.com.br',cnh:'D',ativo:true}];
+  const fleet=[
+    {id:'f1',placa:'BRP-1A23',modelo:'Scania R450 — cavalo',tipo:'Tração',status:'Disponível'},
+    {id:'f2',placa:'BRP-2B34',modelo:'VW Constellation 24.280',tipo:'Tração',status:'Disponível'},
+    {id:'f3',placa:'BRP-3C45',modelo:'Ford Ranger 4x4',tipo:'Tração',status:'Manutenção'},
+    {id:'f4',placa:'RBQ-4D56',modelo:'Carreta prancha 2 eixos',tipo:'Apoio',status:'Disponível'},
+    {id:'f5',placa:'RBQ-5E67',modelo:'Reboque jet ski duplo',tipo:'Apoio',status:'Disponível'},
+    {id:'f6',placa:'RBQ-6F78',modelo:'Carreta baú (Can-Am / Sea-Doo)',tipo:'Apoio',status:'Disponível'}];
+  const r=(id,tr,ap,mot,sol,cham,sa,re,dest,st,obs)=>({id,tracao:tr,apoios:ap,motorista:mot,solicitante:sol,chamado:cham,saida:sa,retorno:re,destino:dest,status:st,obs:obs||'',hist:[],checklists:[]});
+  const res=[
+    r('r1','f1',['f4'],'u3','u5','CH-1042',d(0),d(1),'Evento Sea-Doo — Ilhabela','aprovada','Levar 4 Sea-Doo GTX'),
+    r('r2','f2',['f6'],'u4','u5','CH-1043',d(1),d(2),'Concessionária Campinas','pendente','Entrega Can-Am Maverick'),
+    r('r3','f1',['f5'],'u6','u2','CH-1044',d(3),d(4),'Test ride — Guarujá','aprovada'),
+    r('r4','f2',[],'u3','u5','CH-1045',d(4),d(4),'Coleta peças — Guarulhos','pendente'),
+    r('r5','f1',['f4','f5'],'u4','u1','CH-1046',d(8),d(10),'Feira Náutica — Rio','pendente'),
+    r('r6','f2',['f6'],'u3','u5','CH-1039',d(-3),d(-2),'Entrega cliente — Santos','concluida'),
+    r('r7','f1',[],'u6','u5','CH-1040',d(-1),d(-1),'Revisão Spyder — oficina','rejeitada','Sem motorista disponível')];
+  return {users,fleet,res,perm:JSON.parse(JSON.stringify(PERM_PADRAO))};
+}
+let DB=store.get('frota_db')||seed();
+let S=Object.assign({perfil:'gerente',tab:'agenda',semana:0,fMot:'',fCham:'',ckRes:''},store.get('frota_ui')||{});
+const save=()=>{store.set('frota_db',DB);store.set('frota_ui',S)};
+const can=a=>!!(DB.perm[S.perfil]||{})[a];
+const U=id=>DB.users.find(u=>u.id===id)||{nome:'—'};
+const F=id=>DB.fleet.find(f=>f.id===id)||{placa:'—',modelo:''};
+const meuUser=()=>DB.users.find(u=>u.perfil===S.perfil&&u.ativo);
+function log(r,txt){r.hist.push({quando:new Date().toLocaleString('pt-BR'),quem:PERFIS[S.perfil],txt})}
+
+// conflito: mesmo veículo ou motorista com período sobreposto em reserva ativa
+function conflitos(r,ignoreId){
+  const ativos=['pendente','aprovada','em_uso'];
+  const vs=[r.tracao,...(r.apoios||[])];
+  return DB.res.filter(o=>o.id!==ignoreId&&ativos.includes(o.status)&&!(o.retorno<r.saida||o.saida>r.retorno)&&
+    ([o.tracao,...o.apoios].some(v=>vs.includes(v))||o.motorista===r.motorista));
+}
+
+// ---------- cabeçalho/nav ----------
+const TABS=[['agenda','Agenda semanal'],['nova','Nova reserva'],['fila','Fila de aprovação'],['check','Checklist'],['usuarios','Usuários'],['frota','Frota'],['perm','Permissões']];
+function renderTop(){
+  $('#perfil').innerHTML=Object.entries(PERFIS).map(([k,v])=>`<option value="${k}" ${k===S.perfil?'selected':''}>${v}</option>`).join('');
+  $('#nav').innerHTML=TABS.map(([k,v])=>{
+    let n='';if(k==='fila'){const p=DB.res.filter(r=>r.status==='pendente').length;if(p)n=` (${p})`}
+    return `<button data-tab="${k}" class="${S.tab===k?'on':''}">${v}${n}</button>`}).join('');
+  $('#hoje').textContent=br(TODAY);
+}
+$('#perfil').onchange=e=>{S.perfil=e.target.value;save();render();toast('Perfil: '+PERFIS[S.perfil])};
+$('#nav').onclick=e=>{const b=e.target.closest('button[data-tab]');if(b){S.tab=b.dataset.tab;save();render()}};
+$('#reset').onclick=()=>confirmBox('Restaurar dados de exemplo? Tudo o que foi alterado será perdido.',()=>{DB=seed();save();render();toast('Dados de exemplo restaurados')});
+
+// ---------- modal ----------
+function openModal(html){$('#mbox').innerHTML=html;$('#modal').classList.add('show')}
+function closeModal(){$('#modal').classList.remove('show')}
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+function confirmBox(msg,fn){openModal(`<p style="font-size:16px">${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button id="cNo">Cancelar</button><button class="pri" id="cYes">Confirmar</button></div>`);$('#cNo').onclick=closeModal;$('#cYes').onclick=()=>{closeModal();fn()}}
+
+// ---------- AGENDA ----------
+function viewAgenda(){
+  if(!can('ver_agenda'))return semPerm();
+  const base=addDays(new Date(),S.semana*7);const ini=addDays(base,-((base.getDay()+6)%7)); // segunda
+  const dias=[...Array(7)].map((_,i)=>iso(addDays(ini,i)));
+  let lista=DB.res.filter(r=>(!S.fMot||r.motorista===S.fMot)&&(!S.fCham||r.chamado.toLowerCase().includes(S.fCham.toLowerCase())));
+  const ocult=lista.filter(r=>r.saida<TODAY&&dias.includes(r.saida)).length;
+  lista=lista.filter(r=>r.saida>=TODAY);
+  const mots=DB.users.filter(u=>u.perfil==='motorista');
+  return `<div class="card"><h2>Agenda semanal de ativos</h2>
+  <p class="sub">Cada barra é uma reserva no dia da saída. ${can('arrastar')?'Arraste entre dias ou toque na barra para reagendar.':'Arrastar disponível apenas para o perfil Gerente.'}</p>
+  <div class="row"><button id="wPrev">Semana anterior</button><button class="ghost" id="wHoje">Hoje</button><button id="wNext">Próxima semana</button></div>
+  <div class="row" style="justify-content:space-between;margin-top:14px"><strong style="font-size:17px">${br(dias[0])} – ${br(dias[6])}</strong><span class="badge">${ocult} ocultados</span></div>
+  <div class="info">Exibindo apenas agendamentos de hoje em diante.</div>
+  <div class="grid2" style="margin-top:12px">
+    <div><label>Motorista</label><select id="fMot"><option value="">Todos</option>${mots.map(m=>`<option value="${m.id}" ${S.fMot===m.id?'selected':''}>${esc(m.nome)}</option>`).join('')}</select></div>
+    <div><label>Chamado</label><input id="fCham" placeholder="Ex.: CH-1042" value="${esc(S.fCham)}"></div>
+  </div>
+  <div class="week">${dias.map(d=>{const dd=parse(d);const its=lista.filter(r=>r.saida===d);
+    return `<div class="day ${d===TODAY?'today':''}" data-day="${d}"><h4><span>${DIAS[dd.getDay()]} ${pad(dd.getDate())}/${pad(dd.getMonth()+1)}</span><span>${its.length||''}</span></h4>
+    ${its.map(r=>`<div class="bar s-${r.status}" data-id="${r.id}" ${can('arrastar')?'draggable="true"':''}><b>${esc(F(r.tracao).placa)}</b>${r.apoios.length?' + '+r.apoios.map(a=>esc(F(a).placa)).join(', '):''}<small>${esc(r.chamado)} • ${esc(U(r.motorista).nome)}</small><small>${esc(r.destino)}</small></div>`).join('')||'<div class="muted">—</div>'}</div>`}).join('')}</div>
+  <div class="legend">${Object.entries(STATUS).map(([k,v])=>`<span><i class="s-${k}"></i>${v}</span>`).join('')}</div></div>`;
+}
+function bindAgenda(){
+  $('#wPrev').onclick=()=>{S.semana--;save();render()};$('#wNext').onclick=()=>{S.semana++;save();render()};$('#wHoje').onclick=()=>{S.semana=0;save();render()};
+  $('#fMot').onchange=e=>{S.fMot=e.target.value;save();render()};
+  $('#fCham').oninput=e=>{S.fCham=e.target.value;save();clearTimeout(window._ft);window._ft=setTimeout(()=>{render();const i=$('#fCham');i.focus();i.setSelectionRange(i.value.length,i.value.length)},350)};
+  document.querySelectorAll('.bar').forEach(b=>{
+    b.onclick=()=>detalhe(b.dataset.id);
+    b.ondragstart=e=>e.dataTransfer.setData('text',b.dataset.id);
+  });
+  document.querySelectorAll('.day').forEach(d=>{
+    d.ondragover=e=>{if(can('arrastar')){e.preventDefault();d.classList.add('over')}};
+    d.ondragleave=()=>d.classList.remove('over');
+    d.ondrop=e=>{e.preventDefault();d.classList.remove('over');moverPara(e.dataTransfer.getData('text'),d.dataset.day)};
+  });
+}
+function moverPara(id,dia){
+  const r=DB.res.find(x=>x.id===id);if(!r||!can('arrastar'))return;
+  if(dia<TODAY)return toast('Não é possível agendar no passado');
+  const dur=(parse(r.retorno)-parse(r.saida))/864e5;
+  const novo={...r,saida:dia,retorno:iso(addDays(parse(dia),dur))};
+  const c=conflitos(novo,r.id);
+  if(c.length)return toast('Conflito com '+c.map(x=>x.chamado).join(', '));
+  log(r,`Reagendada de ${br(r.saida)} para ${br(dia)}`);r.saida=novo.saida;r.retorno=novo.retorno;save();render();toast('Reserva '+r.chamado+' movida para '+br(dia));
+}
+function detalhe(id){
+  const r=DB.res.find(x=>x.id===id);if(!r)return;
+  openModal(`<h2 style="margin-top:0">${esc(r.chamado)} <span class="badge">${STATUS[r.status]}</span></h2>
+  <table><tr><th>Tração</th><td>${esc(F(r.tracao).placa)} — ${esc(F(r.tracao).modelo)}</td></tr>
+  <tr><th>Apoios</th><td>${r.apoios.map(a=>esc(F(a).placa+' — '+F(a).modelo)).join('<br>')||'—'}</td></tr>
+  <tr><th>Motorista</th><td>${esc(U(r.motorista).nome)}</td></tr><tr><th>Solicitante</th><td>${esc(U(r.solicitante).nome)}</td></tr>
+  <tr><th>Saída</th><td>${br(r.saida)}</td></tr><tr><th>Retorno</th><td>${br(r.retorno)}</td></tr>
+  <tr><th>Destino</th><td>${esc(r.destino)}</td></tr><tr><th>Obs.</th><td>${esc(r.obs)||'—'}</td></tr>
+  <tr><th>Checklists</th><td>${r.checklists.map(c=>`${c.fase} • ${c.data} • ${c.km} km • ${c.ok}/${CHECK_ITENS.length} itens`).join('<br>')||'—'}</td></tr></table>
+  ${r.hist.length?`<p class="muted">${r.hist.map(h=>`${esc(h.quando)} — ${esc(h.quem)}: ${esc(h.txt)}`).join('<br>')}</p>`:''}
+  ${can('arrastar')&&['pendente','aprovada'].includes(r.status)?`<label style="margin-top:10px">Reagendar saída para</label><input type="date" id="mvD" min="${TODAY}" value="${r.saida}">`:''}
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    ${can('arrastar')&&['pendente','aprovada'].includes(r.status)?`<button class="bad" id="mCanc">Cancelar reserva</button><button class="pri" id="mMv">Salvar data</button>`:''}
+    <button id="mClose">Fechar</button></div>`);
+  $('#mClose').onclick=closeModal;
+  if($('#mMv'))$('#mMv').onclick=()=>{closeModal();moverPara(r.id,$('#mvD')?.value||r.saida)};
+  if($('#mCanc'))$('#mCanc').onclick=()=>{r.status='rejeitada';log(r,'Cancelada pelo gerente');save();closeModal();render();toast('Reserva cancelada')};
+  if($('#mvD')){const v=$('#mvD');$('#mMv').onclick=()=>{const d=v.value;closeModal();moverPara(r.id,d)}}
+}
+
+// ---------- NOVA RESERVA ----------
+function viewNova(){
+  if(!can('criar_reserva'))return semPerm('Seu perfil não pode criar reservas. Peça ao Solicitante ou Gerente.');
+  const tr=DB.fleet.filter(f=>f.tipo==='Tração'),ap=DB.fleet.filter(f=>f.tipo==='Apoio');
+  const mots=DB.users.filter(u=>u.perfil==='motorista'&&u.ativo);
+  const prox='CH-'+(Math.max(1000,...DB.res.map(r=>+r.chamado.replace(/\D/g,'')||0))+1);
+  return `<div class="card"><h2>Nova reserva</h2><p class="sub">Reserve um veículo de tração e os apoios necessários. A reserva entra na fila de aprovação.</p>
+  <form id="fNova"><div class="grid2">
+  <div><label>Chamado</label><input name="chamado" required value="${prox}"></div>
+  <div><label>Veículo de tração</label><select name="tracao" required>${tr.map(f=>`<option value="${f.id}" ${f.status!=='Disponível'?'disabled':''}>${esc(f.placa)} — ${esc(f.modelo)}${f.status!=='Disponível'?' ('+f.status+')':''}</option>`).join('')}</select></div>
+  <div><label>Motorista</label><select name="motorista" required>${mots.map(m=>`<option value="${m.id}">${esc(m.nome)} (CNH ${esc(m.cnh||'—')})</option>`).join('')}</select></div>
+  <div><label>Destino / finalidade</label><input name="destino" required placeholder="Ex.: Evento Sea-Doo — Ilhabela"></div>
+  <div><label>Data de saída</label><input type="date" name="saida" required min="${TODAY}" value="${TODAY}"></div>
+  <div><label>Data de retorno</label><input type="date" name="retorno" required min="${TODAY}" value="${TODAY}"></div>
+  </div>
+  <label style="margin-top:12px">Apoios (reboques / carretas)</label>
+  <div class="grid2">${ap.map(f=>`<label style="display:flex;gap:8px;align-items:center;color:var(--txt);font-size:14px;border:1px solid var(--line);border-radius:10px;padding:10px"><input type="checkbox" name="apoios" value="${f.id}" style="width:auto" ${f.status!=='Disponível'?'disabled':''}>${esc(f.placa)} — ${esc(f.modelo)}</label>`).join('')}</div>
+  <label style="margin-top:12px">Observações</label><textarea name="obs" placeholder="Carga, horários, contatos..."></textarea>
+  <div id="nErr" class="err"></div>
+  <div class="row" style="margin-top:12px"><button class="pri" type="submit">Enviar para aprovação</button></div></form></div>`;
+}
+function bindNova(){
+  const f=$('#fNova');if(!f)return;
+  f.onsubmit=e=>{e.preventDefault();const fd=new FormData(f);
+    const r={id:uid('r'),chamado:fd.get('chamado').trim(),tracao:fd.get('tracao'),apoios:fd.getAll('apoios'),motorista:fd.get('motorista'),
+      solicitante:(meuUser()||{}).id,saida:fd.get('saida'),retorno:fd.get('retorno'),destino:fd.get('destino').trim(),obs:fd.get('obs').trim(),status:'pendente',hist:[],checklists:[]};
+    if(r.retorno<r.saida)return $('#nErr').textContent='O retorno não pode ser antes da saída.';
+    if(DB.res.some(x=>x.chamado.toLowerCase()===r.chamado.toLowerCase()))return $('#nErr').textContent='Já existe uma reserva com esse chamado.';
+    const c=conflitos(r);
+    if(c.length)return $('#nErr').textContent='Conflito de veículo ou motorista com: '+c.map(x=>`${x.chamado} (${br(x.saida)}–${br(x.retorno)})`).join(', ');
+    log(r,'Reserva criada');DB.res.push(r);save();S.tab='fila';render();toast('Reserva '+r.chamado+' enviada para aprovação');
+  };
+}
+
+// ---------- FILA ----------
+function viewFila(){
+  const pend=DB.res.filter(r=>r.status==='pendente').sort((a,b)=>a.saida.localeCompare(b.saida));
+  const rec=DB.res.filter(r=>r.status!=='pendente').sort((a,b)=>b.saida.localeCompare(a.saida)).slice(0,8);
+  const pode=can('aprovar');
+  return `<div class="card"><h2>Fila de aprovação</h2><p class="sub">${pode?'Aprove ou rejeite as solicitações pendentes.':'Somente Aprovador e Gerente podem decidir. Você pode acompanhar o status.'}</p>
+  ${pend.map(r=>`<div class="item"><div class="row" style="justify-content:space-between"><span class="t">${esc(r.chamado)} — ${esc(r.destino)}</span><span class="badge">${br(r.saida)} → ${br(r.retorno)}</span></div>
+  <div class="muted" style="margin:6px 0">${esc(F(r.tracao).placa)}${r.apoios.length?' + '+r.apoios.map(a=>esc(F(a).placa)).join(', '):''} • Motorista: ${esc(U(r.motorista).nome)} • Solicitante: ${esc(U(r.solicitante).nome)}</div>
+  ${r.obs?`<div class="muted">Obs.: ${esc(r.obs)}</div>`:''}
+  ${pode?`<div class="row" style="margin-top:10px"><button class="ok" data-ap="${r.id}">Aprovar</button><button class="bad" data-rj="${r.id}">Rejeitar</button><button data-dt="${r.id}">Detalhes</button></div>`:''}</div>`).join('')||'<div class="info">Nenhuma solicitação pendente. 🎉</div>'}
+  </div><div class="card"><h2 style="font-size:18px">Decisões recentes</h2><div class="tw"><table><tr><th>Chamado</th><th>Saída</th><th>Status</th><th>Destino</th></tr>
+  ${rec.map(r=>`<tr><td>${esc(r.chamado)}</td><td>${br(r.saida)}</td><td><span class="badge">${STATUS[r.status]}</span></td><td>${esc(r.destino)}</td></tr>`).join('')}</table></div></div>`;
+}
+function bindFila(){
+  document.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>{const r=DB.res.find(x=>x.id===b.dataset.ap);r.status='aprovada';log(r,'Aprovada');save();render();toast(r.chamado+' aprovada')});
+  document.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>detalhe(b.dataset.dt));
+  document.querySelectorAll('[data-rj]').forEach(b=>b.onclick=()=>{const r=DB.res.find(x=>x.id===b.dataset.rj);
+    openModal(`<h3 style="margin-top:0">Rejeitar ${esc(r.chamado)}</h3><label>Motivo</label><textarea id="mot" placeholder="Ex.: veículo em manutenção"></textarea><div class="row" style="justify-content:flex-end;margin-top:12px"><button id="x">Cancelar</button><button class="bad" id="y">Rejeitar</button></div>`);
+    $('#x').onclick=closeModal;$('#y').onclick=()=>{r.status='rejeitada';log(r,'Rejeitada: '+($('#mot').value||'sem motivo'));save();closeModal();render();toast(r.chamado+' rejeitada')}});
+}
+
+// ---------- CHECKLIST ----------
+function viewCheck(){
+  if(!can('checklist'))return semPerm('Checklist é preenchido pelo Motorista (ou Gerente).');
+  const eu=meuUser();
+  const elegiveis=DB.res.filter(r=>['aprovada','em_uso'].includes(r.status)&&(S.perfil!=='motorista'||!eu||r.motorista===eu.id||true));
+  if(!elegiveis.find(r=>r.id===S.ckRes))S.ckRes=(elegiveis[0]||{}).id||'';
+  const r=DB.res.find(x=>x.id===S.ckRes);
+  const fase=r?(r.status==='aprovada'?'Saída':'Retorno'):'';
+  return `<div class="card"><h2>Checklist de veículo</h2><p class="sub">Inspeção obrigatória na saída (libera a reserva para "Em uso") e no retorno (conclui a reserva).</p>
+  ${!elegiveis.length?'<div class="info">Nenhuma reserva aprovada ou em uso no momento.</div>':`
+  <label>Reserva</label><select id="ckSel">${elegiveis.map(x=>`<option value="${x.id}" ${x.id===S.ckRes?'selected':''}>${esc(x.chamado)} — ${esc(F(x.tracao).placa)} — ${esc(U(x.motorista).nome)} (${STATUS[x.status]})</option>`).join('')}</select>
+  <div class="info">Fase: <b>${fase}</b> • ${esc(F(r.tracao).placa)}${r.apoios.length?' + '+r.apoios.map(a=>esc(F(a).placa)).join(', '):''} • ${br(r.saida)} → ${br(r.retorno)}</div>
+  <form id="fCk" style="margin-top:10px">${CHECK_ITENS.map((it,i)=>`<label class="chk" style="color:var(--txt);font-size:15px;margin:0"><input type="checkbox" name="i${i}">${it}</label>`).join('')}
+  <div class="grid2" style="margin-top:12px"><div><label>Hodômetro (km)</label><input type="number" name="km" required min="0" placeholder="Ex.: 152340"></div>
+  <div><label>Combustível</label><select name="comb"><option>Cheio</option><option>3/4</option><option>1/2</option><option>1/4</option><option>Reserva</option></select></div></div>
+  <label style="margin-top:12px">Avarias / observações</label><textarea name="obs"></textarea>
+  <div id="ckErr" class="err"></div>
+  <div class="row" style="margin-top:12px"><button class="pri" type="submit">Registrar checklist de ${fase.toLowerCase()}</button></div></form>`}</div>`;
+}
+function bindCheck(){
+  if($('#ckSel'))$('#ckSel').onchange=e=>{S.ckRes=e.target.value;save();render()};
+  const f=$('#fCk');if(!f)return;
+  f.onsubmit=e=>{e.preventDefault();const fd=new FormData(f);const r=DB.res.find(x=>x.id===S.ckRes);
+    const ok=CHECK_ITENS.filter((_,i)=>fd.get('i'+i)).length;
+    if(ok<CHECK_ITENS.length&&!fd.get('obs').trim())return $('#ckErr').textContent='Itens não conferidos: descreva o problema em Avarias/observações.';
+    const fase=r.status==='aprovada'?'Saída':'Retorno';
+    r.checklists.push({fase,data:new Date().toLocaleString('pt-BR'),km:fd.get('km'),comb:fd.get('comb'),ok,obs:fd.get('obs')});
+    r.status=fase==='Saída'?'em_uso':'concluida';log(r,'Checklist de '+fase.toLowerCase()+` (${ok}/${CHECK_ITENS.length})`);
+    save();render();toast('Checklist de '+fase.toLowerCase()+' registrado — '+STATUS[r.status]);
+  };
+}
+
+// ---------- USUÁRIOS ----------
+function viewUsuarios(){
+  const pode=can('usuarios');
+  return `<div class="card"><h2>Usuários</h2><p class="sub">${pode?'Cadastre e edite quem usa o sistema.':'Somente leitura para o seu perfil.'}</p>
+  ${pode?'<button class="pri" id="uNovo">+ Novo usuário</button>':''}
+  <div class="tw" style="margin-top:12px"><table><tr><th>Nome</th><th>Perfil</th><th>E-mail</th><th>CNH</th><th>Status</th>${pode?'<th></th>':''}</tr>
+  ${DB.users.map(u=>`<tr><td>${esc(u.nome)}</td><td>${PERFIS[u.perfil]}</td><td>${esc(u.email)}</td><td>${esc(u.cnh||'—')}</td><td>${u.ativo?'Ativo':'Inativo'}</td>${pode?`<td><button data-ue="${u.id}">Editar</button></td>`:''}</tr>`).join('')}</table></div></div>`;
+}
+function formUser(u){
+  u=u||{nome:'',perfil:'solicitante',email:'',cnh:'',ativo:true};
+  openModal(`<h3 style="margin-top:0">${u.id?'Editar':'Novo'} usuário</h3><form id="fU"><div class="grid2">
+  <div><label>Nome</label><input name="nome" required value="${esc(u.nome)}"></div>
+  <div><label>E-mail</label><input name="email" type="email" required value="${esc(u.email)}"></div>
+  <div><label>Perfil</label><select name="perfil">${Object.entries(PERFIS).map(([k,v])=>`<option value="${k}" ${u.perfil===k?'selected':''}>${v}</option>`).join('')}</select></div>
+  <div><label>CNH (categoria)</label><input name="cnh" value="${esc(u.cnh||'')}" placeholder="Ex.: E"></div>
+  <div><label>Status</label><select name="ativo"><option value="1" ${u.ativo?'selected':''}>Ativo</option><option value="0" ${!u.ativo?'selected':''}>Inativo</option></select></div></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">${u.id?'<button type="button" class="bad" id="uDel">Excluir</button>':''}<button type="button" id="uX">Cancelar</button><button class="pri">Salvar</button></div></form>`);
+  $('#uX').onclick=closeModal;
+  if($('#uDel'))$('#uDel').onclick=()=>{if(DB.res.some(r=>(r.motorista===u.id||r.solicitante===u.id)&&['pendente','aprovada','em_uso'].includes(r.status)))return toast('Usuário tem reservas ativas — inative em vez de excluir');DB.users=DB.users.filter(x=>x.id!==u.id);save();closeModal();render();toast('Usuário excluído')};
+  $('#fU').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target);
+    const d={nome:fd.get('nome').trim(),email:fd.get('email').trim(),perfil:fd.get('perfil'),cnh:fd.get('cnh').trim(),ativo:fd.get('ativo')==='1'};
+    if(u.id)Object.assign(DB.users.find(x=>x.id===u.id),d);else DB.users.push({id:uid('u'),...d});save();closeModal();render();toast('Usuário salvo')};
+}
+function bindUsuarios(){if($('#uNovo'))$('#uNovo').onclick=()=>formUser();document.querySelectorAll('[data-ue]').forEach(b=>b.onclick=()=>formUser(DB.users.find(u=>u.id===b.dataset.ue)))}
+
+// ---------- FROTA ----------
+function viewFrota(){
+  const pode=can('frota');
+  const emUso=id=>DB.res.find(r=>r.status==='em_uso'&&(r.tracao===id||r.apoios.includes(id)));
+  const prox=id=>DB.res.filter(r=>['pendente','aprovada'].includes(r.status)&&r.saida>=TODAY&&(r.tracao===id||r.apoios.includes(id))).sort((a,b)=>a.saida.localeCompare(b.saida))[0];
+  const tot=t=>DB.fleet.filter(f=>f.tipo===t).length;
+  return `<div class="card"><h2>Frota</h2><p class="sub">Veículos de tração e apoios (carretas, reboques). ${tot('Tração')} tração • ${tot('Apoio')} apoios • ${DB.fleet.filter(f=>f.status==='Manutenção').length} em manutenção.</p>
+  ${pode?'<button class="pri" id="fNovo">+ Novo veículo</button>':''}
+  <div class="tw" style="margin-top:12px"><table><tr><th>Placa</th><th>Modelo</th><th>Tipo</th><th>Status</th><th>Próxima saída</th>${pode?'<th></th>':''}</tr>
+  ${DB.fleet.map(f=>{const u=emUso(f.id),p=prox(f.id);return `<tr><td><b>${esc(f.placa)}</b></td><td>${esc(f.modelo)}</td><td>${f.tipo}</td><td>${u?'Em uso ('+esc(u.chamado)+')':esc(f.status)}</td><td>${p?br(p.saida)+' • '+esc(p.chamado):'—'}</td>${pode?`<td><button data-fe="${f.id}">Editar</button></td>`:''}</tr>`}).join('')}</table></div></div>`;
+}
+function formFrota(f){
+  f=f||{placa:'',modelo:'',tipo:'Tração',status:'Disponível'};
+  openModal(`<h3 style="margin-top:0">${f.id?'Editar':'Novo'} veículo</h3><form id="fF"><div class="grid2">
+  <div><label>Placa</label><input name="placa" required value="${esc(f.placa)}"></div>
+  <div><label>Modelo</label><input name="modelo" required value="${esc(f.modelo)}"></div>
+  <div><label>Tipo</label><select name="tipo">${['Tração','Apoio'].map(t=>`<option ${f.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+  <div><label>Status</label><select name="status">${['Disponível','Manutenção','Inativo'].map(t=>`<option ${f.status===t?'selected':''}>${t}</option>`).join('')}</select></div></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">${f.id?'<button type="button" class="bad" id="fDel">Excluir</button>':''}<button type="button" id="fX">Cancelar</button><button class="pri">Salvar</button></div></form>`);
+  $('#fX').onclick=closeModal;
+  if($('#fDel'))$('#fDel').onclick=()=>{if(DB.res.some(r=>(r.tracao===f.id||r.apoios.includes(f.id))&&['pendente','aprovada','em_uso'].includes(r.status)))return toast('Veículo tem reservas ativas');DB.fleet=DB.fleet.filter(x=>x.id!==f.id);save();closeModal();render();toast('Veículo excluído')};
+  $('#fF').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target);const d={placa:fd.get('placa').trim().toUpperCase(),modelo:fd.get('modelo').trim(),tipo:fd.get('tipo'),status:fd.get('status')};
+    if(DB.fleet.some(x=>x.placa===d.placa&&x.id!==f.id))return toast('Placa já cadastrada');
+    if(f.id)Object.assign(DB.fleet.find(x=>x.id===f.id),d);else DB.fleet.push({id:uid('f'),...d});save();closeModal();render();toast('Veículo salvo')};
+}
+function bindFrota(){if($('#fNovo'))$('#fNovo').onclick=()=>formFrota();document.querySelectorAll('[data-fe]').forEach(b=>b.onclick=()=>formFrota(DB.fleet.find(f=>f.id===b.dataset.fe)))}
+
+// ---------- PERMISSÕES ----------
+function viewPerm(){
+  const pode=can('permissoes');
+  return `<div class="card"><h2>Permissões</h2><p class="sub">${pode?'Marque o que cada perfil pode fazer. As mudanças valem na hora.':'Somente o Gerente edita esta matriz.'}</p>
+  <div class="tw"><table class="perm"><tr><th>Ação</th>${Object.values(PERFIS).map(p=>`<th>${p}</th>`).join('')}</tr>
+  ${Object.entries(ACOES).map(([a,n])=>`<tr><td>${n}</td>${Object.keys(PERFIS).map(p=>`<td><input type="checkbox" style="width:20px;height:20px" data-p="${p}" data-a="${a}" ${DB.perm[p][a]?'checked':''} ${!pode||(p==='gerente'&&a==='permissoes')?'disabled':''}></td>`).join('')}</tr>`).join('')}</table></div>
+  ${pode?'<div class="row" style="margin-top:12px"><button id="pReset">Restaurar padrão</button></div>':''}</div>`;
+}
+function bindPerm(){
+  document.querySelectorAll('[data-p]').forEach(c=>c.onchange=()=>{DB.perm[c.dataset.p][c.dataset.a]=c.checked?1:0;save();renderTop();toast('Permissão atualizada')});
+  if($('#pReset'))$('#pReset').onclick=()=>{DB.perm=JSON.parse(JSON.stringify(PERM_PADRAO));save();render();toast('Permissões padrão restauradas')};
+}
+
+function semPerm(msg){return `<div class="card"><h2>Acesso restrito</h2><div class="info">${msg||'Seu perfil não tem acesso a esta tela.'} Troque o perfil em "Entrar como".</div></div>`}
+
+// ---------- render ----------
+const VIEWS={agenda:[viewAgenda,bindAgenda],nova:[viewNova,bindNova],fila:[viewFila,bindFila],check:[viewCheck,bindCheck],usuarios:[viewUsuarios,bindUsuarios],frota:[viewFrota,bindFrota],perm:[viewPerm,bindPerm]};
+function render(){renderTop();const [v,b]=VIEWS[S.tab]||VIEWS.agenda;$('#main').innerHTML=v();b&&b()}
+render();
+</script>
+</body>
+</html>
