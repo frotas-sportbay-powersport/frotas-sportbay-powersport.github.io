@@ -304,10 +304,10 @@ function seed(){
   const apr=(por,h)=>({aprovacao:{dec:'aprovada',por,quando:ago(h),just:''}});
   const res=[
     r('r1','f1',['f4'],'u3','u5','CH-1042',d(0),'07:00',d(1),'19:00','Evento Sea-Doo — Ilhabela','aprovada','Levar 4 Sea-Doo GTX',apr('Rafael Souza',20)),
-    r('r2','f2',['f6'],'u4','u5','CH-1043',d(1),'08:00',d(2),'18:00','Concessionária Campinas','pendente','Entrega Can-Am Maverick',{criado:ago(2)}),
+    r('r2','f2',['f6'],'','u5','CH-1043',d(1),'08:00',d(2),'18:00','Concessionária Campinas','pendente','Entrega Can-Am Maverick',{criado:ago(2)}),
     r('r3','f1',['f5'],'u6','u2','CH-1044',d(3),'06:30',d(4),'20:00','Test ride — Guarujá','aprovada','',apr('Carla Mendes',10)),
-    r('r4','f2',[],'u3','u5','CH-1045',d(4),'09:00',d(4),'17:00','Coleta de peças — Guarulhos','pendente','',{criado:ago(1)}),
-    r('r5','f1',['f4','f5'],'u4','u1','CH-1046',d(8),'05:00',d(10),'22:00','Feira Náutica — Rio de Janeiro','pendente','',{criado:ago(5)}),
+    r('r4','f2',[],'','u5','CH-1045',d(4),'09:00',d(4),'17:00','Coleta de peças — Guarulhos','pendente','',{criado:ago(1)}),
+    r('r5','f1',['f4','f5'],'','u1','CH-1046',d(8),'05:00',d(10),'22:00','Feira Náutica — Rio de Janeiro','pendente','',{criado:ago(5)}),
     r('r6','f2',['f6'],'u3','u5','CH-1039',d(-6),'08:00',d(-5),'18:00','Entrega cliente — Santos','concluida','',Object.assign(apr('Rafael Souza',200),{custos:{combustivel:780,pedagio:96,outros:0},checklists:[
       {fase:'Retirada',quando:ago(150),vistoriador:'Paulo Nunes',responsavel:'u3',km:230800,comb:'Cheio',itens:{},fotos:[],obs:''},
       {fase:'Devolução',quando:ago(120),vistoriador:'Paulo Nunes',responsavel:'u3',km:231420,comb:'1/2',itens:{},fotos:[],obs:''}]})),
@@ -333,7 +333,7 @@ function save(){try{localStorage.setItem(K,JSON.stringify(DB));localStorage.setI
 const me=()=>DB.users.find(u=>u.id===S.user)||DB.users[0];
 if(!DB.users.find(u=>u.id===S.user&&u.ativo))S.user=(DB.users.find(u=>u.perfil==='gerente'&&u.ativo)||DB.users[0]).id;
 const can=a=>!!(DB.perm[me().perfil]||{})[a];
-const U=id=>DB.users.find(u=>u.id===id)||{nome:'—',perfil:''};
+const U=id=>DB.users.find(u=>u.id===id)||{nome:id?'—':'A definir',perfil:''};
 const F=id=>DB.fleet.find(f=>f.id===id)||{placa:'—',modelo:'',marca:'',docs:[],manut:[]};
 const vNome=f=>[f.marca,f.modelo].filter(Boolean).join(' ');
 const ini=n=>(n||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
@@ -344,7 +344,7 @@ const placas=r=>esc(F(r.tracao).placa)+(r.apoios.length?' + '+r.apoios.map(a=>es
 function log(txt,r){const e={q:Date.now(),u:me().nome,txt};DB.log.unshift(e);DB.log.length=Math.min(DB.log.length,400);if(r)r.hist.push(e)}
 function proxChamado(){return 'CH-'+(Math.max(1000,DB.seq||0,...DB.res.map(r=>+String(r.chamado).replace(/\D/g,'')||0))+1)}
 function vStatus(f){if(f.status!=='Disponível')return f.status;return DB.res.some(r=>r.status==='em_uso'&&(r.tracao===f.id||r.apoios.includes(f.id)))?'Em uso':'Disponível'}
-function conflitos(r,ign){const vs=[r.tracao,...r.apoios];return DB.res.filter(o=>o.id!==ign&&ATIVAS.includes(o.status)&&dts(o)<dte(r)&&dts(r)<dte(o)&&([o.tracao,...o.apoios].some(v=>vs.includes(v))||o.motorista===r.motorista))}
+function conflitos(r,ign){const vs=[r.tracao,...r.apoios];return DB.res.filter(o=>o.id!==ign&&ATIVAS.includes(o.status)&&dts(o)<dte(r)&&dts(r)<dte(o)&&([o.tracao,...o.apoios].some(v=>vs.includes(v))||(r.motorista&&o.motorista===r.motorista)))}
 function atrasados(){const n=nowStr();return DB.res.filter(r=>(r.status==='aprovada'&&dts(r)<n)||(r.status==='em_uso'&&dte(r)<n))}
 function pendCheck(){const m=me();return DB.res.filter(r=>['aprovada','em_uso'].includes(r.status)&&(can('checklist_todos')||r.motorista===m.id)).sort((a,b)=>dts(a).localeCompare(dts(b)))}
 function kmRodado(r){const s=r.checklists.find(c=>c.fase==='Retirada'),e=r.checklists.find(c=>c.fase==='Devolução');return s&&e&&+e.km>=+s.km?(+e.km)-(+s.km):0}
@@ -554,11 +554,10 @@ function detalhe(id){
 function vNova(){
   const tr=DB.fleet.filter(f=>f.tipo==='Tração'),ap=DB.fleet.filter(f=>f.tipo==='Apoio'),mots=DB.users.filter(u=>u.perfil==='motorista'&&u.ativo);
   const prox=proxChamado(),bloq=f=>f.status!=='Disponível';
-  return `<form id="fNova" class="card"><h2>Nova reserva</h2><p class="sub">A reserva entra na fila de aprovação. O sistema bloqueia conflitos de veículo e motorista no mesmo horário.</p>
+  return `<form id="fNova" class="card"><h2>Nova reserva</h2><p class="sub">A reserva entra na fila de aprovação. O <b>motorista é definido pelo aprovador</b>. O sistema bloqueia conflitos de veículo e motorista no mesmo horário.</p>
   <div class="ff">
    <div><label class="l">Chamado (automático)</label><input value="${prox}" readonly tabindex="-1" style="background:#f2f4f3;font-weight:700;color:var(--gd)"></div>
    <div><label class="l">Veículo de tração</label><select name="tracao" required>${tr.map(f=>`<option value="${f.id}" ${bloq(f)?'disabled':''}>${esc(f.placa)} — ${esc(vNome(f))}${bloq(f)?' ('+f.status+')':''}</option>`).join('')}</select></div>
-   <div><label class="l">Motorista</label><select name="motorista" required>${mots.map(m=>`<option value="${m.id}">${esc(m.nome)}${m.cnh?' (CNH '+esc(m.cnh)+')':''}</option>`).join('')}</select></div>
    <div><label class="l">Destino / finalidade</label><input name="destino" required placeholder="Ex.: Evento Sea-Doo — Ilhabela"></div>
   </div><div class="ff dt" style="margin-top:12px">
    <div><label class="l">Data de retirada</label><input type="date" name="saida" required min="${TODAY()}" value="${TODAY()}"></div>
@@ -575,10 +574,9 @@ function vNova(){
 function bNova(){
   const f=$('#fNova');f.querySelectorAll('.ci input').forEach(c=>c.onchange=()=>c.closest('.ci').classList.toggle('ok',c.checked));
   f.onsubmit=e=>{e.preventDefault();const d=new FormData(f),g=k=>(d.get(k)||'').trim();
-    const r={id:uid('r'),chamado:proxChamado(),tracao:g('tracao'),apoios:d.getAll('apoios'),motorista:g('motorista'),solicitante:me().id,saida:g('saida'),horaSaida:g('horaSaida'),retorno:g('retorno'),horaRetorno:g('horaRetorno'),destino:g('destino'),obs:g('obs'),status:'pendente',hist:[],checklists:[],criado:Date.now(),custos:{}};
+    const r={id:uid('r'),chamado:proxChamado(),tracao:g('tracao'),apoios:d.getAll('apoios'),motorista:'',solicitante:me().id,saida:g('saida'),horaSaida:g('horaSaida'),retorno:g('retorno'),horaRetorno:g('horaRetorno'),destino:g('destino'),obs:g('obs'),status:'pendente',hist:[],checklists:[],criado:Date.now(),custos:{}};
     const err=t=>$('#nErr').textContent=t;
     if(!r.tracao)return err('Selecione um veículo de tração disponível.');
-    if(!r.motorista)return err('Cadastre ao menos um motorista ativo.');
     if(dts(r)<nowStr().slice(0,16)&&r.saida<TODAY())return err('A retirada não pode ser no passado.');
     if(dte(r)<=dts(r))return err('A devolução precisa ser depois da retirada.');
     if(DB.res.some(x=>x.chamado.toLowerCase()===r.chamado.toLowerCase()))return err('Já existe uma reserva com esse número de chamado.');
@@ -592,9 +590,9 @@ function vAprov(){
   const pend=DB.res.filter(r=>r.status==='pendente').sort((a,b)=>dts(a).localeCompare(dts(b)));
   const hist=DB.res.filter(r=>r.aprovacao&&(!S.aprF||r.aprovacao.dec===S.aprF)).sort((a,b)=>(b.aprovacao.quando||0)-(a.aprovacao.quando||0));
   return `<div class="card"><h2>Aguardando aprovação <span class="chip o">${pend.length}</span></h2>
-  ${pend.map(r=>{const c=conflitos(r,r.id).filter(x=>x.status!=='pendente');return `<div class="info" style="background:#fff;margin-bottom:10px">
+  ${pend.map(r=>{const c=conflitos({...r,motorista:''},r.id).filter(x=>x.status!=='pendente');return `<div class="info" style="background:#fff;margin-bottom:10px">
     <div class="row"><b style="color:var(--t);font-size:15px">${esc(r.chamado)} — ${esc(r.destino)}</b><span class="sp"></span>${chip('pendente')}</div>
-    <div style="margin:6px 0">${placas(r)} · Motorista: <b style="color:var(--t)">${esc(U(r.motorista).nome)}</b> · Solicitado por ${esc(U(r.solicitante).nome)}${r.criado?' em '+fdt(r.criado):''}</div>
+    <div style="margin:6px 0">${placas(r)} · Motorista: <b style="color:${r.motorista?'var(--t)':'var(--o)'}">${esc(U(r.motorista).nome)}</b> · Solicitado por ${esc(U(r.solicitante).nome)}${r.criado?' em '+fdt(r.criado):''}</div>
     <div>Retirada <b style="color:var(--t)">${br(r.saida)} ${r.horaSaida}</b> → Devolução <b style="color:var(--t)">${br(r.retorno)} ${r.horaRetorno}</b></div>
     ${r.obs?`<div>Obs.: ${esc(r.obs)}</div>`:''}
     ${c.length?`<div class="al r" style="margin:8px 0 0">${ic('warn',18)}<span>Conflito com ${c.map(x=>x.chamado).join(', ')}</span></div>`:''}
@@ -605,8 +603,19 @@ function vAprov(){
 }
 function bAprov(){
   $('#aprF').onchange=e=>{S.aprF=e.target.value;render()};
-  $$('[data-ap]').forEach(b=>b.onclick=()=>{const r=DB.res.find(x=>x.id===b.dataset.ap);if(conflitos(r,r.id).some(x=>x.status!=='pendente'))return toast('Conflito com reserva já aprovada.','r');
-    r.status='aprovada';r.aprovacao={dec:'aprovada',por:me().nome,porId:me().id,quando:Date.now(),just:''};log(`Aprovou a reserva ${r.chamado}`,r);render();toast(`${r.chamado} aprovada`)});
+  $$('[data-ap]').forEach(b=>b.onclick=()=>{const r=DB.res.find(x=>x.id===b.dataset.ap);if(conflitos({...r,motorista:''},r.id).some(x=>x.status!=='pendente'))return toast('Conflito de veículo com reserva já aprovada.','r');
+    const mots=DB.users.filter(u=>u.perfil==='motorista'&&u.ativo),ocup=m=>conflitos({...r,motorista:m.id},r.id).some(x=>x.status!=='pendente'&&x.motorista===m.id);
+    openModal(`<h2>Aprovar ${esc(r.chamado)} <button class="x" onclick="closeModal()">×</button></h2>
+     <p class="sub" style="margin:0 0 12px">${placas(r)} · ${br(r.saida)} ${r.horaSaida} → ${br(r.retorno)} ${r.horaRetorno}</p>
+     <label class="l">Motorista designado (obrigatório)</label>
+     <div id="mList">${mots.map(m=>{const oc=ocup(m);return `<label class="ci" style="${oc?'opacity:.5;cursor:not-allowed':''}"><input type="radio" name="mot" value="${m.id}" ${oc?'disabled':''} ${m.id===r.motorista&&!oc?'checked':''} style="width:20px;height:20px;min-height:0;accent-color:var(--gd)"><span><b>${esc(m.nome)}</b><br><small style="color:var(--m)">${m.cnh?'CNH '+esc(m.cnh):'CNH não informada'}${oc?' · ocupado neste horário':' · disponível'}</small></span></label>`}).join('')||'<div class="info">Nenhum motorista ativo cadastrado. Cadastre em Usuários.</div>'}</div>
+     <div id="aErr" class="err"></div>
+     <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" onclick="closeModal()">Voltar</button><button class="btn g" id="aOk">${ic('check',18)} APROVAR</button></div>`);
+    $$('#mList .ci input').forEach(c=>c.onchange=()=>$$('#mList .ci').forEach(x=>x.classList.toggle('ok',x.querySelector('input').checked)));
+    $$('#mList .ci input').forEach(c=>c.checked&&c.closest('.ci').classList.add('ok'));
+    $('#aOk').onclick=()=>{const sel=$('#mList input:checked');if(!sel)return $('#aErr').textContent='Escolha o motorista para aprovar.';
+      const nv={...r,motorista:sel.value},c=conflitos(nv,r.id).filter(x=>x.status!=='pendente');if(c.length)return $('#aErr').textContent='Conflito com '+c.map(x=>x.chamado).join(', ');
+      r.motorista=sel.value;r.status='aprovada';r.aprovacao={dec:'aprovada',por:me().nome,porId:me().id,quando:Date.now(),just:''};log(`Aprovou a reserva ${r.chamado} e designou ${U(r.motorista).nome}`,r);closeModal();render();toast(`${r.chamado} aprovada — motorista: ${U(r.motorista).nome}`)}});
   $$('[data-rp]').forEach(b=>b.onclick=()=>{const r=DB.res.find(x=>x.id===b.dataset.rp);
     openModal(`<h2>Reprovar ${esc(r.chamado)} <button class="x" onclick="closeModal()">×</button></h2><label class="l">Justificativa (obrigatória)</label><textarea id="just" placeholder="Explique o motivo da reprovação"></textarea><div id="jErr" class="err"></div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" onclick="closeModal()">Voltar</button><button class="btn r" id="jOk">REPROVAR</button></div>`);
     $('#just').focus();
